@@ -45,5 +45,27 @@ namespace dotnet_code_challenge.Test
             Assert.Equal("Name: Advancing. Price: 4.2.", messages[1]);
             Assert.Equal("Name: Coronel. Price: 12.", messages[2]);
         }
+
+        [Fact]
+        public void ProcessXMLFeed_FileDoesNotExist_ExpectFileNotFoundException()
+        {
+            // arrange
+            string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string feedFile = $"{Path.GetDirectoryName(path)}\\FeedData\\This_File_Does_Not_Exist.xml";
+
+            ProcessFeedFiles service = new ProcessFeedFiles();
+
+            try
+            {
+                // Act
+                service.ProcessXMLFeed(feedFile);
+            }
+            catch (Exception ex)
+            {
+                // Assert
+                Assert.IsType<FileNotFoundException>(ex);
+            }
+            
+        }
     }
 }

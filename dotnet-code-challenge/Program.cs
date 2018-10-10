@@ -35,7 +35,9 @@ namespace dotnet_code_challenge
             }
             catch (Exception ex)
             {
-
+                // TODO: log error and move file to "unprocessed" location.
+                Console.WriteLine($"processing failed: error message: {ex.Message}.");
+                Console.Write("please refer to the app log for further information.");
                 Console.Read();
             }
 
