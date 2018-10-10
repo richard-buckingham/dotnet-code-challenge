@@ -35,16 +35,7 @@ namespace dotnet_code_challenge.Services
                 JsonSerializer serializer = new JsonSerializer();
                 JSONFeedModel feedModel = (JSONFeedModel)serializer.Deserialize(file, typeof(JSONFeedModel));
 
-                feedModel.RawData.Markets.ToList().ForEach(market =>
-                {
-                    selections.AddRange(market.Selections);
-                });
-
-                messages.Add(feedModel.RawData.FixtureName);
-                selections.OrderBy(s => s.Price).ToList().ForEach(selection =>
-                {
-                    messages.Add($"Name: {selection.Tags.name}. Price: {selection.Price}.");
-                });
+                ConstructMessagesForJSONFeed(messages, selections, feedModel);
             }
 
             return messages;
@@ -61,6 +52,20 @@ namespace dotnet_code_challenge.Services
             var race = meeting.races.race;
 
             return ConstructMessagesForXMLFeed(horseNamePrices, messages, race);
+        }
+
+        private static void ConstructMessagesForJSONFeed(List<string> messages, List<Selection> selections, JSONFeedModel feedModel)
+        {
+            feedModel.RawData.Markets.ToList().ForEach(market =>
+            {
+                selections.AddRange(market.Selections);
+            });
+
+            messages.Add(feedModel.RawData.FixtureName);
+            selections.OrderBy(s => s.Price).ToList().ForEach(selection =>
+            {
+                messages.Add($"Name: {selection.Tags.name}. Price: {selection.Price}.");
+            });
         }
 
         private static void DeserialiseXMLFeed(string filename, out List<HorseNamePrice> horseNamePrices, out List<string> messages, out meeting meeting)
