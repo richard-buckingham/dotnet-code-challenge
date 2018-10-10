@@ -52,17 +52,29 @@ namespace dotnet_code_challenge.Services
 
         public List<string> ProcessXMLFeed(string filename)
         {
-            XmlSerializer reader = new XmlSerializer(typeof(meeting));
-            List<HorseNamePrice> horseNamePrices = new List<HorseNamePrice>();
+            List<HorseNamePrice> horseNamePrices;
+            List<string> messages;
+            meeting meeting;
 
-            List<string> messages = new List<string>();
-
-            StreamReader file = new StreamReader(filename);
-            meeting meeting = (meeting)reader.Deserialize(file);
-            file.Close();
+            DeserialiseXMLFeed(filename, out horseNamePrices, out messages, out meeting);
 
             var race = meeting.races.race;
 
+            return ConstructMessagesForXMLFeed(horseNamePrices, messages, race);
+        }
+
+        private static void DeserialiseXMLFeed(string filename, out List<HorseNamePrice> horseNamePrices, out List<string> messages, out meeting meeting)
+        {
+            XmlSerializer reader = new XmlSerializer(typeof(meeting));
+            horseNamePrices = new List<HorseNamePrice>();
+            messages = new List<string>();
+            StreamReader file = new StreamReader(filename);
+            meeting = (meeting)reader.Deserialize(file);
+            file.Close();
+        }
+
+        private static List<string> ConstructMessagesForXMLFeed(List<HorseNamePrice> horseNamePrices, List<string> messages, meetingRacesRace race)
+        {
             var horsePrices = race.prices.price.horses.ToList();
             race.horses.ToList().ForEach(horse =>
             {
