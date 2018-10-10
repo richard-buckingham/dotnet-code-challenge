@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace dotnet_code_challenge.Services
 {
@@ -19,11 +20,15 @@ namespace dotnet_code_challenge.Services
             {
                 return ProcessJSONFeed(filename);
             }
+            else if (ext == "xml")
+            {
+                return ProcessXMLFeed(filename);
+            }
 
             return new List<string>();
         }
 
-        private List<string> ProcessJSONFeed(string filename)
+        public List<string> ProcessJSONFeed(string filename)
         {
             List<string> messages = new List<string>();
 
@@ -47,6 +52,44 @@ namespace dotnet_code_challenge.Services
             }
 
             return messages;
+        }
+
+        public List<string> ProcessXMLFeed(string filename)
+        {
+            XmlSerializer reader = new XmlSerializer(typeof(meeting));
+            List<HorseNamePrice> horseNamePrices = new List<HorseNamePrice>();
+
+            List<string> messages = new List<string>();
+
+            StreamReader file = new StreamReader(filename);
+            meeting meeting = (meeting)reader.Deserialize(file);
+            file.Close();
+
+            var race = meeting.races.race;
+
+            var horsePrices = race.prices.price.horses.ToList();
+            race.horses.ToList().ForEach(horse =>
+            {
+                var price = horsePrices.FirstOrDefault(horsePrice => horsePrice.number == horse.number);
+                if (price != null)
+                {
+                    horseNamePrices.Add(new HorseNamePrice() { Name = horse.name, Price = price.Price });
+                }
+            });
+
+            messages.Add(race.name);
+            horseNamePrices.OrderBy(p => p.Price).ToList().ForEach(hnp =>
+            {
+                messages.Add($"Name: {hnp.Name}. Price: {hnp.Price}.");
+            });
+
+            return messages;
+        }
+
+        private class HorseNamePrice
+        {
+            public string Name { get; set; }
+            public decimal Price { get; set; }
         }
     }
 }
