@@ -1,4 +1,6 @@
-﻿using System;
+﻿using dotnet_code_challenge.Services;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace dotnet_code_challenge
@@ -10,13 +12,24 @@ namespace dotnet_code_challenge
             string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string feedDirectory = $"{Path.GetDirectoryName(path)}\\FeedData";
 
+            var processFeeds = new ProcessFeedFiles();
+            List<string> messages = new List<string>();
+
             try
             {
                 foreach (string filename in Directory.EnumerateFiles(feedDirectory))
                 {
-                    Console.WriteLine(filename);
-
+                    messages = processFeeds.ProcessFeedFile(filename);
+                    messages.ForEach(message =>
+                    {
+                        Console.WriteLine(message);
+                    });
+                    Console.WriteLine(String.Empty);
                 }
+
+                // TODO: move file to "processed" location.
+                Console.Write("press enter to continue");
+                Console.Read();
 
                 Console.Read();
             }
@@ -27,6 +40,13 @@ namespace dotnet_code_challenge
             }
 
 
+        }
+    }
+
+    internal class ProcessFeeds
+    {
+        public ProcessFeeds()
+        {
         }
     }
 }
