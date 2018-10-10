@@ -17,15 +17,11 @@ namespace dotnet_code_challenge.Services
             var ext = filename.Substring(lastIndex + 1).ToLower();
 
             if (ext == "json")
-            {
                 return ProcessJSONFeed(filename);
-            }
             else if (ext == "xml")
-            {
                 return ProcessXMLFeed(filename);
-            }
-
-            return new List<string>();
+            else
+                throw new ApplicationException($"cannot process invalid file {filename} with ext: {ext}");
         }
 
         public List<string> ProcessJSONFeed(string filename)

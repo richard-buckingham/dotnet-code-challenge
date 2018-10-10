@@ -64,8 +64,31 @@ namespace dotnet_code_challenge.Test
             {
                 // Assert
                 Assert.IsType<FileNotFoundException>(ex);
+            } 
+        }
+
+
+        [Fact]
+        public void ProcessXMLFeed_FileHasNonSupportedExtension_ExpectCorrectMessage()
+        {
+            // arrange
+            string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string feedFile = $"{Path.GetDirectoryName(path)}\\FeedData\\FileWithNonSupportedExtension.xyz";
+
+            ProcessFeedFiles service = new ProcessFeedFiles();
+            List<String> messages = new List<string>();
+
+            try
+            {
+                // act
+                service.ProcessFeedFile(feedFile);
             }
-            
+            catch (Exception ex)
+            {
+                // assert
+                Assert.Contains("cannot process invalid file", ex.Message);
+            }
+
         }
     }
 }
